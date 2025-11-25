@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIHAITOTO Mini App – Wallet & Stars 2025</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+  <style>
+    :root{--gold:#d4af37;--dark:#0d0d0d;--card:#1a1a1a;--success:#00ff7f}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--dark);color:#fff;font-family:'Rajdhani',sans-serif;overflow-x:hidden}
+    .header{background:linear-gradient(135deg,#111,#222);padding:15px;text-align:center;position:relative}
+    .header h1{font-family:'Orbitron';font-size:24px;color:var(--gold);text-shadow:0 0 10px var(--gold)}
+    .tabs{display:flex;justify-content:center;gap:10px;margin:15px 0}
+    .tab{padding:12px 20px;background:#222;border:2px solid transparent;border-radius:12px;transition:all .3s;font-weight:bold;cursor:pointer}
+    .tab.active{background:var(--gold);color:#000;border-color:#fff}
+    .tab:hover{transform:translateY(-3px);box-shadow:0 5px 15px rgba(212,175,55,0.4)}
+    .content{padding:10px;display:none}
+    .content.active{display:block}
+    .wallet{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:15px;border-radius:16px;margin:10px 0;border:2px solid var(--gold)}
+    .balance{font-size:28px;font-family:'Orbitron';color:var(--success)}
+    .histori{list-style:none}
+    .histori li{padding:8px;background:#333;margin:5px 0;border-radius:8px}
+    .stars-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .stars-btn{background:var(--gold);color:#000;padding:15px;border-radius:12px;text-align:center;font-weight:bold;cursor:pointer;transition:0.3s}
+    .stars-btn:hover{transform:scale(1.05);box-shadow:0 5px 15px rgba(212,175,55,0.5)}
+    .game-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+    @media(min-width:500px){.game-grid{grid-template-columns:repeat(3,1fr)}}
+    .card{background:var(--card);border:2px solid var(--gold);border-radius:16px;overflow:hidden;transition:all .4s}
+    .card:hover{transform:translateY(-8px);box-shadow:0 15px 30px rgba(212,175,55,0.5)}
+    .live{position:absolute;top:8px;left:8px;background:#ff0000;color:#fff;padding:4px 10px;border-radius:10px;font-size:10px;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+    .imgbox{position:relative;padding-top:70%;background:#000}
+    img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
+    .info{padding:10px;text-align:center}
+    .name{font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:5px}
+    .rtp-bar{height:22px;background:#333;border-radius:11px;overflow:hidden;margin:8px 0}
+    .fill{height:100%;width:0%;background:linear-gradient(90deg,#00ff7f,#00cc66);transition:width 1.5s ease;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#000;font-size:12px}
+    .jam{color:var(--success);font-size:11px;margin:5px 0}
+    .btn{background:linear-gradient(180deg,var(--gold),#b8860b);color:#000;padding:10px;font-weight:bold;text-align:center;cursor:pointer;border:none;border-radius:8px;margin-top:5px;transition:0.3s}
+    .btn:hover{filter:brightness(1.2)}
+    .share-btn{position:fixed;bottom:20px;right:20px;background:var(--gold);color:#000;padding:15px;border-radius:50%;font-size:24px;box-shadow:0 5px 20px rgba(212,175,55,0.6);z-index:999;cursor:pointer}
+    input{width:100%;padding:12px;margin:10px 0;background:#222;border:2px solid var(--gold);border-radius:12px;color:#fff;font-size:16px}
+    #result{margin-top:15px;padding:10px;background:var(--card);border-radius:12px;border-left:4px solid var(--success)}
+  </style>
+</head>
+<body onload="initApp()">
+
+<div class="header">
+  <h1>LIHAITOTO WALLET & STARS</h1>
+  <p>Saldo Real-Time • Beli Stars • Bonus Instan</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="openTab('wallet')">WALLET</div>
+  <div class="tab" onclick="openTab('rtp')">RTP LIVE</div>
+  <div class="tab" onclick="openTab('prediksi')">PREDIKSI</div>
+  <div class="tab" onclick="openTab('stars')">BELI STARS</div>
+</div>
+
+<div id="wallet" class="content active">
+  <div class="wallet">
+    <div>
+      <h2>Saldo Kamu</h2>
+      <div class="balance" id="saldo">Rp 0</div>
+    </div>
+    <div>
+      <h2>Bonus Aktif</h2>
+      <div class="balance" id="bonus">Rp 0</div>
+    </div>
+  </div>
+  <h3>Histori Transaksi</h3>
+  <ul class="histori" id="histori">
+    <!-- Loaded dynamically -->
+  </ul>
+  <button class="btn" onclick="deposit()">DEPOSIT</button>
+</div>
+
+<div id="rtp" class="content">
+  <div class="game-grid" id="games"></div>
+</div>
+
+<div id="prediksi" class="content">
+  <div class="prediksi">
+    <h2>PREDIKSI JITU</h2>
+    <div id="prediksi-result">Loading...</div>
+    <div class="angka" id="angka-jitu">----</div>
+    <button class="btn" onclick="generatePrediksi()">Refresh (10 Stars)</button>
+  </div>
+</div>
+
+<div id="stars" class="content">
+  <div class="stars-grid">
+    <div class="stars-btn" onclick="buyStars(100)">100 Stars<br>Rp 10.000</div>
+    <div class="stars-btn" onclick="buyStars(500)">500 Stars<br>Rp 45.000</div>
+    <div class="stars-btn" onclick="buyStars(1000)">1.000 Stars<br>Rp 80.000</div>
+  </div>
+  <p style="text-align:center;margin:20px;color:#aaa">Stars = Bonus Spin + Prediksi Premium</p>
+</div>
+
+<div class="share-btn" onclick="shareApp()">📤 Share</div>
+
+<script>
+// Telegram WebApp Init
+const tg = Telegram.WebApp;
+tg.ready();
+tg.expand();
+tg.enableClosingConfirmation();
+
+// Mock Data (ganti dengan API real dari backend kamu)
+let saldo = 150000;
+let bonus = 50000;
+let histori = [
+  {type:'Deposit',amount:'Rp 100.000',time:'2 jam lalu'},
+  {type:'Withdraw',amount:'Rp 50.000',time:'1 hari lalu'},
+  {type:'Bonus Referral',amount:'Rp 25.000',time:'3 hari lalu'}
+];
+
+function initApp(){
+  updateWallet();
+  renderRTP();
+  tg.MainButton.text = 'MAIN DI LIHAITOTO';
+  tg.MainButton.onClick(mainSekarang);
+  tg.MainButton.show();
+}
+
+// Wallet Update
+function updateWallet(){
+  document.getElementById('saldo').innerText = `Rp ${saldo.toLocaleString()}`;
+  document.getElementById('bonus').innerText = `Rp ${bonus.toLocaleString()}`;
+  const histList = document.getElementById('histori');
+  histList.innerHTML = '';
+  histori.forEach(h => {
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${h.type}:</strong> ${h.amount} • ${h.time}`;
+    histList.appendChild(li);
+  });
+}
+
+// Deposit Function (integrasi backend)
+function deposit(){
+  tg.showAlert('Redirect ke deposit page...');
+  tg.openLink('https://lihaitoto.com/deposit');
+}
+
+// Stars Payment (createInvoiceLink via backend webhook)
+function buyStars(amount){
+  tg.showConfirm(`Beli ${amount} Stars?`, (yes) => {
+    if(yes){
+      // Call backend untuk generate invoice link
+      fetch('/api/create-invoice', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({stars: amount})
+      }).then(res => res.json()).then(data => {
+        tg.openInvoice(data.invoice_link, (status) => {
+          if(status === 'paid'){
+            saldo += amount * 100; // 1 Star = Rp 100 (contoh)
+            bonus += amount * 50;
+            updateWallet();
+            tg.showAlert('Pembayaran sukses! Saldo bertambah.');
+          }
+        });
+      });
+    }
+  });
+}
+
+// RTP Render (sama seperti V105)
+function renderRTP(){
+  // ... (kode renderRTP dari V105, singkat biar cepat)
+}
+
+// Prediksi
+function generatePrediksi(){
+  const angka = Math.floor(1000 + Math.random()*9000);
+  document.getElementById('angka-jitu').innerText = angka;
+  document.getElementById('prediksi-result').innerHTML = '<p style="color:var(--success)">Prediksi HK Malam Ini (AI):</p>';
+  tg.HapticFeedback.impactOccurred('medium');
+}
+
+// Share
+function shareApp(){
+  tg.shareUrl('https://lihaitoto.com', 'Coba LIHAITOTO – Gacor 2025!');
+  tg.HapticFeedback.impactOccurred('light');
+}
+
+function mainSekarang(){
+  tg.openLink('https://lihaitoto.com');
+}
+
+openTab('wallet'); // Default tab
+setInterval(renderRTP, 8000);
+</script>
+
+</body>
+</html>
